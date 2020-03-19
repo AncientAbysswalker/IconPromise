@@ -22,7 +22,7 @@ function IconExtractor(){
 
   this.iconProcess.stdout.on('data', function(data){
 
-    var str = (new Buffer(data, 'utf8')).toString('utf8');
+    var str = (new Buffer.from(data, 'utf8')).toString('utf8');
 
     iconDataBuffer += str;
 
