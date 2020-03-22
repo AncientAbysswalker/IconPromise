@@ -1,6 +1,6 @@
 {
   "name": "icon-promise",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Given a path, return base64 data of the icon used for that file in the form of a promise",
   "main": "win-iconPromise.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "keywords": [
     "icon",
     "extractor",
-	"promise",
+    "promise",
     "windows"
   ],
   "author": "AncientAbysswalker",
