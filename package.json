@@ -1,26 +1,27 @@
 {
-  "name": "icon-extractor",
-  "version": "1.0.3",
-  "description": "Given a path, return base64 data of the icon used for that file",
-  "main": "win-iconExtractor.js",
+  "name": "icon-promise",
+  "version": "1.0.4",
+  "description": "Given a path, return base64 data of the icon used for that file in the form of a promise",
+  "main": "win-iconPromise.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ScienceVikings/IconExtractor.git"
+    "url": "git+https://github.com/AncientAbysswalker/IconPromise.git"
   },
   "keywords": [
     "icon",
     "extractor",
+	"promise",
     "windows"
   ],
-  "author": "Justin Basinger",
+  "author": "AncientAbysswalker",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ScienceVikings/IconExtractor/issues"
+    "url": "https://github.com/AncientAbysswalker/IconPromise/issues"
   },
-  "homepage": "https://github.com/ScienceVikings/IconExtractor#readme",
+  "homepage": "https://github.com/AncientAbysswalker/IconPromise#readme",
   "dependencies": {
     "lodash": "^3.10.1"
   }
