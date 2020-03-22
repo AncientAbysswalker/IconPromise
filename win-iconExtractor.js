@@ -1,63 +1,81 @@
-var EventEmitter = require('events');
-var fs = require('fs');
-var child_process = require('child_process');
-var _ = require('lodash');
-var os = require('os');
-var path = require('path');
+let EventEmitter = require('events');
+let fs = require('fs');
+let child_process = require('child_process');
+let os = require('os');
+let path = require('path');
+let _ = require('lodash');
 
-var emitter = new EventEmitter();
+let emitter = new EventEmitter();
 
-function IconExtractor(){
+function IconPromise(){
 
-  var self = this;
-  var iconDataBuffer = "";
-
-  this.emitter = new EventEmitter();
-  this.iconProcess = child_process.spawn(getPlatformIconProcess(),['-x']);
+  //this.emitter = new EventEmitter();
 
   this.getIcon = function(context, path){
-    var json = JSON.stringify({context: context, path: path}) + "\n";
-    self.iconProcess.stdin.write(json);
-  }
+    this.iconProcess = child_process.spawn(getPlatformIconProcess(),['-x']);
 
-  this.iconProcess.stdout.on('data', function(data){
+    let json = JSON.stringify({context: context, path: path}) + "\n";
+    let iconDataBuffer = "";
 
-    var str = (new Buffer.from(data, 'utf8')).toString('utf8');
+    this.iconProcess.stdin.write(json);
 
-    iconDataBuffer += str;
+    // Here we create an await our promise:
+    return new Promise((resolve, reject) => {
+      //let self = this;
 
-    //Bail if we don't have a complete string to parse yet.
-    if (!_.endsWith(str, '\n')){
-      return;
-    }
+      //console.log(json);
+      this.iconProcess.stdout.on('data', data => {
+        let str = (new Buffer.from(data, 'utf8')).toString('utf8');
 
-    //We might get more than one in the return, so we need to split that too.
-    _.each(iconDataBuffer.split('\n'), function(buf){
+        iconDataBuffer += str;
 
-      if(!buf || buf.length == 0){
-        return;
-      }
+        //Bail if we don't have a complete string to parse yet.
+        if (!_.endsWith(str, '\n')){
+          console.log("endswith n");
+          return;
+        }
 
-      try{
-        self.emitter.emit('icon', JSON.parse(buf));
-      } catch(ex){
-        self.emitter.emit('error', ex);
-      }
+        //We might get more than one in the return, so we need to split that too.
+        _.each(iconDataBuffer.split('\n'), function(buf){
 
+          if(!buf || buf.length == 0){
+            console.log("no buffer");
+            return;
+          }
+
+          try{
+            console.log("try");
+            //console.log(JSON.parse(buf))
+            return resolve(JSON.parse(buf));
+            console.log("fail");
+            //self.emitter.emit('icon', JSON.parse(buf));
+          } catch(ex){
+            console.log("failed JSON parse");
+            return resolve(false);
+            //self.emitter.emit('error', ex);
+          }
+
+        });
+      }); // call resolve when its done
+      this.iconProcess.stdout.on('error', err => {
+        console.log("stdout error");
+        return reject(err);
+      }); // don't forget this
+
+      this.iconProcess.on('error', err => {
+        console.log("general error");
+        return reject(err.toString());
+      });
+
+      this.iconProcess.stderr.on('data', err => {
+        return reject(err.toString());
+      });
     });
-  });
-
-  this.iconProcess.on('error', function(err){
-    self.emitter.emit('error', err.toString());
-  });
-
-  this.iconProcess.stderr.on('data', function(err){
-    self.emitter.emit('error', err.toString());
-  });
+  }
 
   function getPlatformIconProcess(){
     if(os.type() == 'Windows_NT'){
-      return path.join(__dirname,'/bin/IconExtractor.exe');
+      return path.join(__dirname,'/bin/IconPromise.exe');
       //Do stuff here to get the icon that doesn't have the shortcut thing on it
     } else {
       throw('This platform (' + os.type() + ') is unsupported =(');
@@ -66,4 +84,4 @@ function IconExtractor(){
 
 }
 
-module.exports = new IconExtractor();
+module.exports = new IconPromise();
