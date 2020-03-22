@@ -1,16 +1,10 @@
-let EventEmitter = require('events');
 let fs = require('fs');
 let child_process = require('child_process');
 let os = require('os');
 let path = require('path');
 let _ = require('lodash');
 
-let emitter = new EventEmitter();
-
 function IconPromise(){
-
-  //this.emitter = new EventEmitter();
-
   this.getIcon = function(context, path){
     this.iconProcess = child_process.spawn(getPlatformIconProcess(),['-x']);
 
