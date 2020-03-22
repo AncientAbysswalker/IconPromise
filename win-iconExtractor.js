@@ -6,62 +6,54 @@ let _ = require('lodash');
 
 function IconPromise(){
   this.getIcon = function(context, path){
-    this.iconProcess = child_process.spawn(getPlatformIconProcess(),['-x']);
+    let iconProcess = child_process.spawn(getPlatformIconProcess(), ['-x']);
 
-    let json = JSON.stringify({context: context, path: path}) + "\n";
+    // Initialize buffer
     let iconDataBuffer = "";
 
-    this.iconProcess.stdin.write(json);
+    // Start process to parse icon data
+    let json = JSON.stringify({context: context, path: path}) + "\n";
+    iconProcess.stdin.write(json);
 
-    // Here we create an await our promise:
+    // Return a promise that we will return a json object for the icon:
     return new Promise((resolve, reject) => {
-      //let self = this;
 
-      //console.log(json);
-      this.iconProcess.stdout.on('data', data => {
+      // Trigger event on stdout buffer
+      iconProcess.stdout.on('data', data => {
         let str = (new Buffer.from(data, 'utf8')).toString('utf8');
 
+        // Add data to buffer
         iconDataBuffer += str;
 
-        //Bail if we don't have a complete string to parse yet.
+        //Wait until later if we do not have the full icon data to parse
         if (!_.endsWith(str, '\n')){
-          console.log("endswith n");
           return;
         }
 
-        //We might get more than one in the return, so we need to split that too.
+        // There may e more than one event for the buffer; consider each
         _.each(iconDataBuffer.split('\n'), function(buf){
 
+          // Wait until later if the buffer is empty
           if(!buf || buf.length == 0){
-            console.log("no buffer");
             return;
           }
 
+          // Attempt to parse the full buffer
           try{
-            console.log("try");
-            //console.log(JSON.parse(buf))
             return resolve(JSON.parse(buf));
-            console.log("fail");
-            //self.emitter.emit('icon', JSON.parse(buf));
           } catch(ex){
-            console.log("failed JSON parse");
-            return resolve(false);
-            //self.emitter.emit('error', ex);
+            return resolve(ex);
           }
-
         });
-      }); // call resolve when its done
-      this.iconProcess.stdout.on('error', err => {
-        console.log("stdout error");
-        return reject(err);
-      }); // don't forget this
+      });
 
-      this.iconProcess.on('error', err => {
-        console.log("general error");
+      // Throw promise reject if error in iconProcess
+      iconProcess.on('error', err => {
         return reject(err.toString());
       });
 
-      this.iconProcess.stderr.on('data', err => {
+      // Throw promise reject if stderr
+      iconProcess.stderr.on('data', err => {
         return reject(err.toString());
       });
     });
@@ -75,7 +67,6 @@ function IconPromise(){
       throw('This platform (' + os.type() + ') is unsupported =(');
     }
   }
-
 }
 
 module.exports = new IconPromise();
