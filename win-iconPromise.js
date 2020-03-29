@@ -5,7 +5,7 @@ let path = require('path');
 let _ = require('lodash');
 
 function IconPromise(){
-  this.getIcon = function(context, path){
+  this.getIcon = function(path, context = "No Context Provided"){
     let iconProcess = child_process.spawn(getPlatformIconProcess(), ['-x']);
 
     // Initialize buffer
@@ -30,7 +30,7 @@ function IconPromise(){
           return;
         }
 
-        // There may e more than one event for the buffer; consider each
+        // There may be more than one event for the buffer; consider each
         _.each(iconDataBuffer.split('\n'), function(buf){
 
           // Wait until later if the buffer is empty
@@ -42,7 +42,7 @@ function IconPromise(){
           try{
             return resolve(JSON.parse(buf));
           } catch(ex){
-            return resolve(ex);
+            return reject(ex);
           }
         });
       });
