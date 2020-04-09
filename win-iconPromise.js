@@ -6,15 +6,18 @@ let _ = require('lodash');
 
 function IconPromise(){
 
+  // Default location of the IconExtractor.exe executable
+  let processPath = path.join(__dirname,'/bin/IconExtractor.exe');
+
   /**
    * Extracts image data from a file's icon and provides it wrapped in a
    *     promise, with an optional argument that allows for the adjustment of
    *     size. Default size is 32x32 pixels.
    * @param {string} path The file path for the document that we would like to
    *     extract the icon data of.
-   * @param {string} sizeArg The size argument string to be passed through to
-   *     the .NET framework code
-   * @param {string} context A context string that will be returned with the
+   * @param {string=} sizeArg The size argument string to be passed through to
+   *     the .NET framework code.
+   * @param {string=} context A context string that will be returned with the
    *     JSON object to lend insight into the function caller
    * @return {Promise} Returns a promise for a javascript object that contains the
    *     icon image data.
@@ -78,7 +81,7 @@ function IconPromise(){
    *     promise, with the size set as 16x16 pixels.
    * @param {string} path The file path for the document that we would like to
    *     extract the icon data of.
-   * @param {string} context A context string that will be returned with the
+   * @param {string=} context A context string that will be returned with the
    *     JSON object to lend insight into the function caller
    * @return {Promise} Returns a promise for a javascript object that contains the
    *     icon image data.
@@ -92,7 +95,7 @@ function IconPromise(){
    *     promise, with the size set as 32x32 pixels.
    * @param {string} path The file path for the document that we would like to
    *     extract the icon data of.
-   * @param {string} context A context string that will be returned with the
+   * @param {string=} context A context string that will be returned with the
    *     JSON object to lend insight into the function caller
    * @return {Promise} Returns a promise for a javascript object that contains the
    *     icon image data.
@@ -106,7 +109,7 @@ function IconPromise(){
    *     promise, with the size set as 48x48 pixels.
    * @param {string} path The file path for the document that we would like to
    *     extract the icon data of.
-   * @param {string} context A context string that will be returned with the
+   * @param {string=} context A context string that will be returned with the
    *     JSON object to lend insight into the function caller
    * @return {Promise} Returns a promise for a javascript object that contains the
    *     icon image data.
@@ -120,7 +123,7 @@ function IconPromise(){
    *     promise, with the size set as 256x256 pixels.
    * @param {string} path The file path for the document that we would like to
    *     extract the icon data of.
-   * @param {string} context A context string that will be returned with the
+   * @param {string=} context A context string that will be returned with the
    *     JSON object to lend insight into the function caller
    * @return {Promise} Returns a promise for a javascript object that contains the
    *     icon image data.
@@ -129,9 +132,28 @@ function IconPromise(){
     return this.getIcon(path, '--size-256', context);
   }
 
+  /**
+   * Manually sets the path of the IconExtractor executable.
+   * @param {string} extractorPath The new folder path for the IconExtractor
+   *     executable file.
+   * @param {string=} newName Indicate the new name of the IconExtractor 
+   *     executable file, if it has changed from "IconExtractor.exe". This
+   *     argument does not need the file extension.
+   */
+  this.overrideExtractorPath = function(extractorPath, newName = 'IconExtractor.exe'){
+    newName = (newName.split('.').pop() == "exe") ? newName : (newName + '.exe');
+    processPath = path.join(extractorPath, newName);
+    return;
+  }
+
+  /**
+   * Confirms that we are not using Windows NT.
+   * @return {string} Returns the string path of where the IconExtractor
+   *     executable is.
+   */
   function getPlatformIconProcess(){
     if(os.type() == 'Windows_NT'){
-      return path.join(__dirname,'/bin/IconExtractor.exe');
+      return processPath;
       //Do stuff here to get the icon that doesn't have the shortcut thing on it
     } else {
       throw('This platform (' + os.type() + ') is unsupported =(');

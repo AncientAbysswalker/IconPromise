@@ -16,6 +16,10 @@ To get an icon's data you need to call one of the following methods:
 * `iconPromise.getIcon48(filePath, context)`
 * `iconPromise.getIcon256(filePath, context)`
 
+### Install
+
+`npm i icon-promise`
+
 ### Method Descriptions
 
 #### `iconPromise.getIcon(filePath, sizeArg, context)`
@@ -69,3 +73,16 @@ The other arguments and return remain the same as iconPromise.getIcon().
 Extracts image data from a file's icon and provides it wrapped in a promise.
 This method extends iconPromise.getIcon() and requests size at 256x256 pixels.
 The other arguments and return remain the same as iconPromise.getIcon().
+
+#### `iconPromise.overrideExtractorPath(extractorPath)`
+
+In select situations, it is useful to be able to override (read manually define) the location of the
+.NET executable. In such instances, the iconPromise.overrideExtractorPath()
+method should be called before trying to extract icon data using the
+iconPromise.getIcon() method or its kin. This method does not return; it changes
+where icon-retrieving methods reference the executable.
+
+###### Arguments:
+* `extractorPath`: the path to where the executable will be found.
+* `newName` (optional): the new name of the executable file, if you have decided
+to rename it, though this is not recommended. Default is IconExtractor.exe, and the ".exe" will be appended if you forget it.
